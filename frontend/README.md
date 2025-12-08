@@ -58,3 +58,4 @@ The embedded styling was moved into a separate external stylesheet (`styles.css`
 * **Troubleshooting:** Resolved local caching issues using "Hard Reload" (`Ctrl + Shift + R`) and the **Disable cache** option in DevTools, ensuring immediate visual confirmation of CSS changes.
 
 ---
+
