@@ -59,3 +59,18 @@ The embedded styling was moved into a separate external stylesheet (`styles.css`
 
 ---
 
+## Strategic Pivot: Deployment & Scope Prioritization
+
+### Current Architecture Status
+The project has successfully reached the **Static Website** milestone (HTML/CSS). The resume is visually complete, semantic, and ready for public viewing.
+
+### Decision to Deploy Now
+To ensure the project meets critical delivery timelines, I am proceeding immediately to the **AWS Frontend** infrastructure phase, deferring the implementation of the complex React application.
+
+**Rationale:**
+1.  **Critical Path Delivery:** Due to time constraints, the priority is to establish a live, accessible cloud artifact immediately. Deploying the current Static Website ensures a valid submission is ready while preserving the integrity of the resume content.
+2.  **Infrastructure Focus:** The core objective of this challenge is cloud engineering. By freezing the frontend scope at HTML/CSS, I can dedicate full resources to correctly architecting the AWS pipeline (S3, CloudFront, Route 53, OAC) without distraction.
+3.  **Iterative Enhancement:** The transition to a React Single Page Application (SPA) is now scoped as a **Phase 2 enhancement**. I may revisit the frontend architecture to implement React and dynamic features once the cloud infrastructure is fully operational and stabilized.
+
+---
+
