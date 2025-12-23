@@ -1,0 +1,19 @@
+---
+- name: Deploy Resume to S3
+  hosts: localhost
+  connection: local
+  vars:
+    # UPDATE THESE TWO LINES
+    bucket_name: "ma-resume.com-v3" 
+    source_path: "../../frontend/public/" 
+
+  tasks:
+    - name: Sync local files to S3 bucket
+      amazon.aws.s3_object:
+        bucket: "{{ bucket_name }}"
+        src: "{{ item }}"
+        object: "{{ item | relpath(source_path) }}"
+        mode: put
+      with_fileglob:
+        - "{{ source_path }}/*"
+        - "{{ source_path }}/assets/images/*"
