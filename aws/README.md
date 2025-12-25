@@ -24,7 +24,7 @@ I manually configured this CloudFront distribution to handle secure global deliv
 ## Phase 2. Infrastructure as Code (CloudFormation)
 Once I had a working proof of concept live on the web, I transitioned to a semi-automated workflow by creating the **ma-resume-v2** bucket through CloudFormation. I chose this middle step to isolate and test my infrastructure scripts in a "sandbox" environment without risking the availability of my live manual site. This "split-brain" phase allowed me to verify that my CloudFormation templates and Ansible playbooks worked before I attempted to migrate my production DNS and CDN settings into code using the **ma-resume.com-v3** bucket in phase 3.
 
-For phase 2 **ma-resume-v2**, I used CloudFormation to define the skeletal infrastructure, ensuring the environment was reproducible and version-controlled. I wrote a YAML template that defined my bucket, configured it for static website hosting, and set up the necessary public read permissions.
+For phase 2, I used CloudFormation to define the skeletal infrastructure, ensuring the environment was reproducible and version-controlled. I wrote a YAML template that defined my bucket, configured it for static website hosting, and set up the necessary public read permissions.
 
 ### Key Resources
 * **S3 Bucket:** Configured for static website hosting with a public read policy.
@@ -48,7 +48,7 @@ Since I am working on Windows, I set up WSL (Windows Subsystem for Linux) and in
 
 **Ansible Environment [WSL terminal output showing ansible --version]**
 
-![alt text](ansible-version-wsl.png)
+![alt text](ansible-version.png)
 
 I ran the playbook from my WSL terminal. It used my CRC-bot credentials to securely talk to AWS and ensured my live site matches my local code.
 
@@ -74,6 +74,55 @@ During the deployment of the full-stack template, I ran into a challenge where t
 **Full-Stack CloudFormation Success This is the final status showing the successful creation of the entire infrastructure including the bucket, CDN, and DNS.**
 
 ![alt text](full-stack-cloudFormation-success.png)
+
+## Phase 4. Serverless Backend & Visitor Counter
+With the infrastructure fully automated, the final piece of the AWS puzzle was transforming the static resume into a dynamic application. I built a serverless backend to track and display live visitor telemetry.
+
+This phase was particularly rewarding because it involved connecting the frontend to the backend through a secure, asynchronous loop.
+
+### Backend Architecture
+I expanded my single `main-infrastructure.yaml` CloudFormation template to include the entire backend stack, ensuring the database and logic are managed as part of the same lifecycle as the website storage.
+
+* **Database (DynamoDB):** Created a NoSQL table with a "Pay-Per-Request" billing model to store the visitor count.
+* **Logic (AWS Lambda):** Wrote a Python script using the `boto3` SDK to atomically increment the visitor count in DynamoDB.
+* **API (API Gateway):** Deployed a REST API to serve as the "front door," allowing the public internet to securely trigger the Lambda function.
+
+**DynamoDB Table Provisioning [Screenshot showing CREATE_COMPLETE for the VisitorCounterTable]**
+
+![alt text](VisitorCounterTable.png)
+
+### Logic & Integration
+I used **JavaScript** on the frontend to perform an asynchronous `fetch` call to the **API Gateway** endpoint. This ensures the page loads instantly and the visitor count populates once the backend responds.
+
+**Lambda Logic & Successful Test Execution**
+
+![alt text](lambda-logic.png)
+
+**"Test" results in the Lambda console showing the "Succeeded" message and the JSON response.**
+
+Verified the backend integration by triggering manual test events in the Lambda console. Successfully confirmed atomic increments in the DynamoDB table, validated by the JSON response payload.
+
+![alt text](lambda-test.png)
+
+**API Gateway Verification [Screenshot showing the JSON response in the browser]**
+
+![alt text](API-URL.png)
+
+### Visual Polish
+To ensure the visitor counter was prominent, I moved it outside the main white resume container and onto the wood-textured background. I styled it as a "stats badge" using CSS to match the professional aesthetic of the site's header.
+
+**Final Live Production Site with Working Counter**
+
+![alt text](visitor-counter.png)
+
+
+### Lifecycle Management & Security Patching
+In December 2025, I performed a proactive security audit of the stack. After receiving an AWS Health notification regarding the deprecation of the Python 3.9 runtime, I executed the following environment upgrades:
+
+* **Cloud Infrastructure:** Migrated the Lambda function runtime from `python3.9` to `python3.12` via CloudFormation. This ensures the backend remains within the AWS support window and receives critical security patches.
+* **Local Development:** Upgraded the local automation environment from an EOL Python 3.8/Ansible 2.9 setup to a modern **Python 3.12** and **Ansible-core 2.20.1** stack managed via Miniconda. 
+
+This maintenance cycle demonstrates the ability to manage technical debt and respond to lifecycle events in a production-grade cloud environment.
 
 ## Final Verification and Decommissioning
 To prove that the new v3 bucket was actually serving the site, I performed a content change test. I modified my index.html locally, pushed it via Ansible to the v3 bucket, and invalidated the CloudFront cache. Once I confirmed the changes were live at https://ma-resume.com, I deleted the old ma-resume.com and ma-resume-v2 buckets. The site stayed up, confirming that the new automated stack is the sole source of truth.
@@ -103,3 +152,6 @@ The development environment was authenticated using Access Keys and configured f
 * **Automation:** AWS CLI, Ansible
 * **Identity:** AWS IAM
 * **Storage:** Amazon S3
+* **Database:** Amazon DynamoDB
+* **Compute:** AWS Lambda (Python)
+* **API:** Amazon API Gateway

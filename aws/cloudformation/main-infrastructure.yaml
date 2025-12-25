@@ -73,3 +73,115 @@ Resources:
       AliasTarget:
         HostedZoneId: Z2FDTNDATAQYW2 # This is the fixed Zone ID for CloudFront
         DNSName: !GetAtt ResumeDistribution.DomainName
+
+  # 5. DYNAMODB TABLE (Visitor Counter)
+  VisitorCounterTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: crc-visitor-counter
+      AttributeDefinitions:
+        - AttributeName: "id"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "id"
+          KeyType: "HASH"
+      BillingMode: PAY_PER_REQUEST     
+
+  # 6. IAM ROLE FOR LAMBDA
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [lambda.amazonaws.com]
+            Action: ['sts:AssumeRole']
+      Policies:
+        - PolicyName: LambdaDynamoDBPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                Resource: !GetAtt VisitorCounterTable.Arn
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: arn:aws:logs:*:*:*
+
+  # 7. LAMBDA FUNCTION
+  VisitorCounterFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: crc-visitor-counter-func
+      Runtime: python3.12
+      Handler: index.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          dynamodb = boto3.resource('dynamodb')
+          table = dynamodb.Table('crc-visitor-counter')
+          def lambda_handler(event, context):
+              response = table.get_item(Key={'id': 'visitors'})
+              count = response.get('Item', {}).get('count', 0)
+              new_count = int(count) + 1
+              table.put_item(Item={'id': 'visitors', 'count': new_count})
+              return {
+                  'statusCode': 200,
+                  'headers': {
+                      'Access-Control-Allow-Origin': '*',
+                      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
+                  },
+                  'body': json.dumps({'count': str(new_count)})
+              }    
+  # 8. API GATEWAY
+  VisitorCounterAPI:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: crc-visitor-counter-api
+
+  VisitorCounterResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref VisitorCounterAPI
+      ParentId: !GetAtt VisitorCounterAPI.RootResourceId
+      PathPart: "get"
+
+  VisitorCounterMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref VisitorCounterAPI
+      ResourceId: !Ref VisitorCounterResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaArn}/invocations
+          - LambdaArn: !GetAtt VisitorCounterFunction.Arn
+
+  VisitorCounterDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: VisitorCounterMethod
+    Properties:
+      RestApiId: !Ref VisitorCounterAPI
+      StageName: prod
+
+  # 9. PERMISSION FOR API TO CALL LAMBDA
+  LambdaApiPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref VisitorCounterFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${VisitorCounterAPI}/*/GET/get"            

@@ -84,3 +84,27 @@ ul {
 section { margin-bottom: 20px; }
 article { margin-bottom: 15px; }
 .job-dates { font-style: italic; font-size: 14px;}
+
+/*--------------------------------------------------
+  4. VISITOR COUNTER STYLING
+--------------------------------------------------*/
+
+.visitor-stats {
+    display: block;      /* Changed to block for centering */
+    text-align: center;  /* Centers the text inside */
+    margin: 20px auto;   /* Centers the box itself and adds space from the main white box */
+    width: fit-content;  /* Ensures the background only wraps the text */
+    background: rgba(0, 0, 0, 0.75); 
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: bold;
+    border: 2px solid #333;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    font-size: 16px;
+}
+
+#counter {
+    color: #007bff; /* Blue accent for the actual number */
+    margin-left: 5px;
+}
