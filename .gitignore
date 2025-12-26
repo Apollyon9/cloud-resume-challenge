@@ -1,1 +1,10 @@
-Miniconda3-latest-Linux-x86_64.sh
+# Ignore shell scripts (like the Miniconda installer)
+*.sh
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore environment folders
+venv/
+.env
