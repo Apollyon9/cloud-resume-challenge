@@ -2,6 +2,42 @@
 
 This directory contains the **Infrastructure as Code (IaC)** and **Configuration Management** scripts used to deploy and manage the cloud environment.
 
+## Project Summary
+My primary focus was on the cloud implementation of this challenge. I wanted to get familiar with the AWS services and their implementation through **Infrastructure as Code (IaC)** and automation. Therefore, I used **Ansible** and **CloudFormation** to manage my entire stack. By automating the deployment of both the static website assets and the serverless visitor counter, I ensured a consistent and repeatable process for my cloud environment.
+
+## Architecture
+
+       +---------------------------------------+
+       |           User Browser                |
+       +---------------------------------------+
+                 |             |
+        (DNS)    |             | (HTTPS)
+      Route 53 <-+             +-> CloudFront (CDN)
+                                     |
+                                     | (OAC Secure Access)
+                                     v
+                           +-----------------------+
+                           | S3 Bucket (Frontend)  |
+                           +-----------------------+
+                                     |
+                                     | (JS API Call)
+                                     v
+                           +-----------------------+
+                           |     API Gateway       |
+                           +-----------------------+
+                                     |
+                                     v
+                           +-----------------------+
+                           | Lambda (Python 3.12)  |
+                           +-----------------------+
+                                     |
+                                     v
+                           +-----------------------+
+                           |  DynamoDB (Backend)   |
+                           +-----------------------+
+
+  Deployment: Managed via Ansible & CloudFormation (IaC)
+
 ## Overview
 I built this cloud-native resume as part of a mission to master AWS deployment. My approach followed a three-phase evolution: 
 
