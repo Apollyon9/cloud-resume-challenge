@@ -9,3 +9,35 @@ Thumbs.db
 venv/
 .env
 *.exe
+azure/images/terraform.tfstate.backup
+
+# Terraform local state and binaries
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Local .terraform directories
+**/.terraform/*
+
+# State files
+*.tfstate
+*.tfstate.*
+
+# Crash logs
+crash.log
+
+# Ignore sensitive variables
+*.tfvars
+
+# --- Terraform Global Ignores ---
+# Ignores all .terraform directories recursively
+**/.terraform/*
+
+# Ignores all state files anywhere in the project
+*.tfstate
+*.tfstate.*
+
+# Ignores sensitive variable files
+*.tfvars
+*.tfvars.json
