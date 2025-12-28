@@ -49,11 +49,11 @@ I intentionally started by deploying my resume manually using the **AWS Manageme
 
 Before automating, I validated the foundation by manually creating the ma-resume.com S3 bucket in the us-east-1 region. This screenshot confirms the bucket properties are correctly established to host my static assets and source code
 
-![alt text](s3-bucket-properties.png)
+![alt text](./images/s3-bucket-properties.png)
 
 I manually configured this CloudFront distribution to handle secure global delivery. By attaching a Custom SSL Certificate from ACM and mapping my Custom Domain (ma-resume.com), I ensured that the resume is accessible via HTTPS. I also set the Default Root Object to index.html so the site loads instantly upon visiting the domain.
 
-![alt text](cloudfront-general-settings.png)
+![alt text](./images/cloudfront-general-settings.png)
 
 ---
 
@@ -68,14 +68,14 @@ For phase 2, I used CloudFormation to define the skeletal infrastructure, ensuri
 
 **Template Definition**
 
-![alt text](cfn-template-code.png)
+![alt text](./images/cfn-template-code.png)
 
 ### Deployment Execution
 The stack was deployed using the following CLI command:
 `aws cloudformation create-stack --stack-name resume-s3-stack --template-body file://s3-bucket.yaml`
 
 > **Stack Creation Status**
-![alt text](cfn-stack-create-complete.png)
+![alt text](./images/cfn-stack-create-complete.png)
 
 ## Automated Deployment (Ansible)
 I didn't want to manually upload my files every time I made a change to my resume so I chose Ansible to handle my configuration management and deployment.
@@ -84,17 +84,17 @@ Since I am working on Windows, I set up WSL (Windows Subsystem for Linux) and in
 
 **Ansible Environment [WSL terminal output showing ansible --version]**
 
-![alt text](ansible-version.png)
+![alt text](./images/ansible-version.png)
 
 I ran the playbook from my WSL terminal. It used my CRC-bot credentials to securely talk to AWS and ensured my live site matches my local code.
 
 **Successful Playbook Execution [Terminal output showing the PLAY RECAP with changed=X in yellow/green]**
 
-![alt text](ansible-deploy-success.png)
+![alt text](./images/ansible-deploy-success.png)
 
 **S3 Content Verification [S3 Bucket console showing the files and assets/folder uploaded by Ansible]**
 
-![alt text](s3.bucket.files.png)
+![alt text](./images/s3.bucket.files.png)
 
 ---
 
@@ -107,9 +107,9 @@ This step was important because it ensures that the entire stack is managed as c
 
 During the deployment of the full-stack template, I ran into a challenge where the stack failed because the domain name was still tied to my manual CloudFront distribution. I had to manually release the CNAME from the old distribution and delete the existing Route 53 A record before the new stack could successfully claim them. Dealing with this taught me a lot about how AWS handles resource uniqueness and the importance of a clean environment when switching to IaC.
 
-**Full-Stack CloudFormation Success This is the final status showing the successful creation of the entire infrastructure including the bucket, CDN, and DNS.**
+**Full-Stack CloudFormation Success - This is the final status showing the successful creation of the entire infrastructure including the bucket, CDN, and DNS.**
 
-![alt text](full-stack-cloudFormation-success.png)
+![alt text](./images/full-stack-cloudFormation-success.png)
 
 ## Phase 4. Serverless Backend & Visitor Counter
 With the infrastructure fully automated, the final piece of the AWS puzzle was transforming the static resume into a dynamic application. I built a serverless backend to track and display live visitor telemetry.
@@ -125,31 +125,31 @@ I expanded my single `main-infrastructure.yaml` CloudFormation template to inclu
 
 **DynamoDB Table Provisioning [Screenshot showing CREATE_COMPLETE for the VisitorCounterTable]**
 
-![alt text](VisitorCounterTable.png)
+![alt text](./images/VisitorCounterTable.png)
 
 ### Logic & Integration
 I used **JavaScript** on the frontend to perform an asynchronous `fetch` call to the **API Gateway** endpoint. This ensures the page loads instantly and the visitor count populates once the backend responds.
 
 **Lambda Logic & Successful Test Execution**
 
-![alt text](lambda-logic.png)
+![alt text](./images/lambda-logic.png)
 
 **"Test" results in the Lambda console showing the "Succeeded" message and the JSON response.**
 
 Verified the backend integration by triggering manual test events in the Lambda console. Successfully confirmed atomic increments in the DynamoDB table, validated by the JSON response payload.
 
-![alt text](lambda-test.png)
+![alt text](./images/lambda-test.png)
 
 **API Gateway Verification [Screenshot showing the JSON response in the browser]**
 
-![alt text](API-URL.png)
+![alt text](./images/API-URL.png)
 
 ### Visual Polish
 To ensure the visitor counter was prominent, I moved it outside the main white resume container and onto the wood-textured background. I styled it as a "stats badge" using CSS to match the professional aesthetic of the site's header.
 
 **Final Live Production Site with Working Counter**
 
-![alt text](visitor-counter.png)
+![alt text](./images/visitor-counter.png)
 
 
 ### Lifecycle Management & Security Patching
@@ -165,7 +165,7 @@ To prove that the new v3 bucket was actually serving the site, I performed a con
 
 **Clean Production Environment - This shows my S3 console after deleting the legacy buckets, leaving only the v3 bucket managed by CloudFormation.**
 
-![alt text](clean-prod-environment.png)
+![alt text](./images/clean-prod-environment.png)
 
 ## Security & Authentication
 Following AWS best practices, a dedicated **IAM User** named CRC-bot was created for programmatic access, avoiding the use of the root account.
@@ -175,11 +175,11 @@ The development environment was authenticated using Access Keys and configured f
 
 **IAM User Credentials**
 
-![alt text](iam-user-redacted-keys.png)
+![alt text](./images/iam-user-redacted-keys.png)
 
 **Identity Verification**
 
-![alt text](cli-identity-verification.png)
+![alt text](./images/cli-identity-verification.png)
 
 ---
 

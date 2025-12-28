@@ -84,17 +84,12 @@
   <div class="visitor-stats">
       Total Visitors: <span id="counter">Loading...</span>
 </div>
-
+  
 <script>
     const counter = document.querySelector('#counter');
     async function updateCounter() {
-        // Placeholder for Azure Phase
-        counter.innerHTML = " Azure Phase Loading...";
-
-        /* COMMENTING OUT AWS LOGIC:
-           We will replace this block with the Azure Function URL once the backend is ready.
-           
         try {
+            // Replace the URL below with your actual API Gateway Invoke URL
             let response = await fetch('https://ssoq3g0rtk.execute-api.us-east-1.amazonaws.com/prod/get');
             let data = await response.json();
             counter.innerHTML = ` ${data.count}`;
@@ -102,7 +97,6 @@
             console.error("Error fetching visitor count:", error);
             counter.innerHTML = " Error loading count";
         }
-        */
     }
     updateCounter();
 </script>
