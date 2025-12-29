@@ -1,43 +1,79 @@
-# Ignore shell scripts (like the Miniconda installer)
-*.sh
-
-# Ignore OS-specific files
+############################################
+# OS / Editor junk
+############################################
 .DS_Store
 Thumbs.db
-
-# Ignore environment folders
-venv/
-.env
-*.exe
-azure/images/terraform.tfstate.backup
-
-# Terraform local state and binaries
-*.tfstate
-*.tfstate.*
-.terraform/
-.terraform.lock.hcl
-
-# Local .terraform directories
-**/.terraform/*
-
-# State files
-*.tfstate
-*.tfstate.*
-
-# Crash logs
 crash.log
 
-# Ignore sensitive variables
-*.tfvars
+############################################
+# VS Code
+############################################
+.vscode/*
+!.vscode/extensions.json
 
-# --- Terraform Global Ignores ---
-# Ignores all .terraform directories recursively
+############################################
+# Python
+############################################
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments (all locations)
+venv/
+.venv/
+**/.venv/
+.env
+
+############################################
+# Azure Functions (local only)
+############################################
+local.settings.json
+.funcignore
+
+############################################
+# Terraform
+############################################
+# Local terraform directories
+.terraform/
 **/.terraform/*
 
-# Ignores all state files anywhere in the project
+# Terraform state (never commit)
 *.tfstate
 *.tfstate.*
+terraform.tfstate
+terraform.tfstate.backup
+terraform.tfstate.*
 
-# Ignores sensitive variable files
+# Terraform variables (may contain secrets)
 *.tfvars
 *.tfvars.json
+
+# NOTE:
+# .terraform.lock.hcl IS intentionally NOT ignored
+# (it should be committed)
+
+############################################
+# Build artifacts / binaries
+############################################
+*.exe
+*.dll
+*.zip
+
+############################################
+# Logs
+############################################
+*.log
+
+############################################
+# Node / frontend (future-proofing)
+############################################
+node_modules/
+dist/
+build/
+
+############################################
+# Misc
+############################################
+*.swp
+*.tmp

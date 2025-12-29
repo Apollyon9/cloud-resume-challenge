@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "hashicorp.terraform",
+    "ms-azuretools.vscode-azurefunctions",
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-azuretools.vscode-azureappservice"
+  ]
+}
