@@ -84,33 +84,32 @@
   <div class="visitor-stats">
       Total Visitors: <span id="counter">Loading...</span>
 </div>
-  
+
 <script>
-// 1. Point to your local Azure Function URL
-    const functionApi = 'http://localhost:7071/api/GetResumeCounter';
-    const counterElement = document.getElementById("counter");
+  // Use same-origin so Front Door + custom domain always works
+  const functionApi = "/api/GetResumeCounter";
+  const counterElement = document.getElementById("counter");
 
-    async function getVisitCount() {
-        try {
-            // 2. Fetch the data from your Python backend
-            const response = await fetch(functionApi);
-            const data = await response.json();
-            
-            console.log("Website successfully called Azure Function.");
-            
-            // 3. Update the 'Loading...' text with the actual count
-            counterElement.innerText = data.count;
-        } catch (error) {
-            console.log("Error connecting to Azure Function:", error);
-            counterElement.innerText = "Error";
-        }
+  async function getVisitCount() {
+    try {
+      const response = await fetch(functionApi, { cache: "no-store" });
+      const data = await response.json();
+
+      console.log("Website successfully called Counter API.");
+      counterElement.innerText = data.count;
+    } catch (error) {
+      console.log("Error connecting to Counter API:", error);
+      counterElement.innerText = "Error";
     }
+  }
 
-    // 4. Run the function automatically when the page loads
-    window.addEventListener('DOMContentLoaded', (event) => {
-        getVisitCount();
-    });
+  window.addEventListener("DOMContentLoaded", () => {
+    getVisitCount();
+  });
 </script>
+</body>
+</html>
+
 
 </body>
 </html>
